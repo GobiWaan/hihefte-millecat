@@ -130,7 +130,7 @@ def selectionner_caracteristique(personnages_restants): #TESTED AND FONCTIONNAL
 
     for t in types_caracteristiques_ordre_aleatoire():
         for v in valeurs_ordre_aleatoire(t):
-            dicCompteur[(t, v)] = score_dichotomie(personnages, t, v)
+            dicCompteur[(t, v)] = score_dichotomie(personnages_restants, t, v)
     highScore = max(dicCompteur, key=lambda key: dicCompteur[key])
 
     return highScore
