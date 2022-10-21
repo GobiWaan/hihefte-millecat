@@ -3,7 +3,7 @@ from random import shuffle, sample
 from personnages import CARACTERISTIQUES
 
 
-def types_caracteristiques_ordre_aleatoire(): #TESTED AND FONCTIONNAL
+def types_caracteristiques_ordre_aleatoire():  # TESTED AND FONCTIONNAL
     """
     Donne les types de caractéristiques dans un ordre aléatoire.
 
@@ -19,11 +19,11 @@ def types_caracteristiques_ordre_aleatoire(): #TESTED AND FONCTIONNAL
     """
     listeShuffelledTypes = list(CARACTERISTIQUES.keys())
     shuffle(listeShuffelledTypes)
-    
+
     return listeShuffelledTypes
 
 
-def valeurs_ordre_aleatoire(type_caracteristique): #TESTED AND FONCTIONNAL
+def valeurs_ordre_aleatoire(type_caracteristique):  # TESTED AND FONCTIONNAL
     """
     Donne les valeurs de caractéristiques dans un ordre aléatoire,
     pour un type de caractéristique donné.
@@ -42,7 +42,7 @@ def valeurs_ordre_aleatoire(type_caracteristique): #TESTED AND FONCTIONNAL
     return sample(listeShuffelledValues, len(listeShuffelledValues))
 
 
-def possede(donnees_personnage, type_caracteristique, valeur_caracteristique): #TTESTED AND FONCTIONNAL
+def possede(donnees_personnage, type_caracteristique, valeur_caracteristique):  # TTESTED AND FONCTIONNAL
     """
     Indique si la valeur de caractéristique fait partie des données du personnage.
 
@@ -62,6 +62,7 @@ def possede(donnees_personnage, type_caracteristique, valeur_caracteristique): #
     return (donnees_personnage[type_caracteristique] == valeur_caracteristique)
 
 
+# TESTED AND FONCTIONNAL
 def score_dichotomie(personnages_restants, type_caracteristique, valeur_caracteristique): #TESTED AND FONCTIONNAL
     """
     Retourne un score en fonction du nombre de personnages restants ayant ou n'ayant pas la
@@ -97,17 +98,20 @@ def score_dichotomie(personnages_restants, type_caracteristique, valeur_caracter
     sansCaracteristique = 0
 
     for personne in personnages_restants.values():
+        if type_caracteristique not in personne:
+            return 0
         if personne[type_caracteristique] == valeur_caracteristique:
             avecCaracteristique += 1
         else:
             sansCaracteristique += 1
-    
-    score = nombrePersonnagesTotal - max(avecCaracteristique, sansCaracteristique)
+
+    score = nombrePersonnagesTotal - \
+        max(avecCaracteristique, sansCaracteristique)
 
     return score
 
 
-def selectionner_caracteristique(personnages_restants):
+def selectionner_caracteristique(personnages_restants): #TESTED AND FONCTIONNAL
     """
     Parmi tous les couples type/valeur de caractéristiques, retourne
     celui qui présente le meilleur score de dichotomie. Les types et valeurs doivent être
@@ -122,10 +126,17 @@ def selectionner_caracteristique(personnages_restants):
     Returns:
         (string, string): Le type et la valeur ayant le meilleur score dichotomique
     """
-    # CODE HERE
+    dicCompteur = {}
+
+    for t in types_caracteristiques_ordre_aleatoire():
+        for v in valeurs_ordre_aleatoire(t):
+            dicCompteur[(t, v)] = score_dichotomie(personnages, t, v)
+    highScore = max(dicCompteur, key=lambda key: dicCompteur[key])
+
+    return highScore
 
 
-def mettre_a_jour_hypotheses(personnages_restants, type_caracteristique, valeur_caracteristique, reponse):
+def mettre_a_jour_hypotheses(personnages_restants, type_caracteristique, valeur_caracteristique, reponse): #TESTED AND FONCTIONNAL
     """
     Retourne un dictionnaire basé sur le dictionnaire de personnages restants en paramètre, dans
     lequel on enlève les personnages qui possèdent ou ne possèdent pas la caractéristique en paramètres.
@@ -144,17 +155,29 @@ def mettre_a_jour_hypotheses(personnages_restants, type_caracteristique, valeur_
     Returns:
         dict: Le dictionnaire de personnages restants mis à jour.
     """
-    # VOTRE CODE ICI
+    personneToKill = []
+    restantTemporaire = personnages_restants.copy()
+
+    for personne, data in restantTemporaire.items():
+        if possede(data, type_caracteristique, valeur_caracteristique) != reponse:
+            personneToKill.append(personne)
+
+    for personne in personneToKill:
+        del restantTemporaire[personne]
+
+    return restantTemporaire
 
 
-if __name__ == '__main__':
+if __name__ == '__main__': #ALL TESTS SUCCESSFUL
     print("Tests unitaires...")
 
     # Test de la fonction types_caracteristiques_ordre_aleatoire
-    assert len(types_caracteristiques_ordre_aleatoire()) == len(CARACTERISTIQUES)
+    assert len(types_caracteristiques_ordre_aleatoire()
+               ) == len(CARACTERISTIQUES)
 
     # Test de la fonction valeurs_ordre_aleatoire
-    assert len(valeurs_ordre_aleatoire("cheveux")) == len(CARACTERISTIQUES["cheveux"])
+    assert len(valeurs_ordre_aleatoire("cheveux")) == len(
+        CARACTERISTIQUES["cheveux"])
 
     # Tests de la fonction possede
     donnees = {"cheveux": "bruns", "accessoires": ["chapeau"]}
@@ -173,7 +196,9 @@ if __name__ == '__main__':
     # Aucun test n'est fourni pour selectionner_caracteristiques
 
     # Tests de la fonction mettre_a_jour_hypotheses
-    # assert len(mettre_a_jour_hypotheses(personnages, 'genre', 'homme', True)) == 3
-    # assert len(mettre_a_jour_hypotheses(personnages, 'genre', 'homme', False)) == 2
+    assert len(mettre_a_jour_hypotheses(
+        personnages, 'genre', 'homme', True)) == 3
+    assert len(mettre_a_jour_hypotheses(
+        personnages, 'genre', 'homme', False)) == 2
 
     print("Tests réussis!")
