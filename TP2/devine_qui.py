@@ -1,9 +1,9 @@
-from random import shuffle
+from random import shuffle, sample
 
 from personnages import CARACTERISTIQUES
 
 
-def types_caracteristiques_ordre_aleatoire():
+def types_caracteristiques_ordre_aleatoire(): #TESTED AND FONCTIONNAL
     """
     Donne les types de caractéristiques dans un ordre aléatoire.
 
@@ -17,10 +17,16 @@ def types_caracteristiques_ordre_aleatoire():
     Returns:
         list: La liste des types de caractéristiques
     """
-    # VOTRE CODE ICI
+    listeShuffeldTypes = []
+    
+    for type in CARACTERISTIQUES.keys():
+            listeShuffeldTypes.append(type)
+    
+    shuffle(listeShuffeldTypes)
+    return listeShuffeldTypes
 
 
-def valeurs_ordre_aleatoire(type_caracteristique):
+def valeurs_ordre_aleatoire(type_caracteristique): #TESTED AND FONCTIONNAL
     """
     Donne les valeurs de caractéristiques dans un ordre aléatoire,
     pour un type de caractéristique donné.
@@ -35,7 +41,8 @@ def valeurs_ordre_aleatoire(type_caracteristique):
     Returns:
         list: La liste des valeurs possibles pour ce type de caractéristique
     """
-    # VOTRE CODE ICI
+    listeTemporaire = CARACTERISTIQUES[type_caracteristique]
+    return sample(listeTemporaire, len(listeTemporaire))
 
 
 def possede(donnees_personnage, type_caracteristique, valeur_caracteristique):
