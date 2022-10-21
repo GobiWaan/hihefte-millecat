@@ -48,7 +48,7 @@ def charger_personnages():
     """
     personnages = {}
     nom = None
-    with open("personnages.txt", "r") as fichier_personnages:
+    with open("/home/igor/Documents/IFT-1004/TP2/personnages.txt", "r") as fichier_personnages:
         for ligne in fichier_personnages:
             if ligne != '\n':
                 cle, valeur = lire_entree(ligne)
