@@ -59,11 +59,17 @@ def possede(donnees_personnage, type_caracteristique, valeur_caracteristique):  
     Returns:
         bool: True si le personnage possède la caractéristique, False sinon.
     """
-    return (donnees_personnage[type_caracteristique] == valeur_caracteristique)
+    #C'est la fonction qui m'a pris le plus de temps... vous m'avez bien eu avec les valeurs en liste!
+    
+    if type_caracteristique not in ["accessoires", "pilosite"]: #Puisque ces deux types possede des dictionnaires
+        return (donnees_personnage[type_caracteristique] == valeur_caracteristique) #Bool possede ou non la valeur_caracteristique
+    else:
+        return valeur_caracteristique in donnees_personnage[type_caracteristique] #Bool valeur_caracteristique IN liste de valeurs ("accessoires" et "pilosite" possede liste valeurs)
 
 
 # TESTED AND FONCTIONNAL
-def score_dichotomie(personnages_restants, type_caracteristique, valeur_caracteristique): #TESTED AND FONCTIONNAL
+# TESTED AND FONCTIONNAL
+def score_dichotomie(personnages_restants, type_caracteristique, valeur_caracteristique):
     """
     Retourne un score en fonction du nombre de personnages restants ayant ou n'ayant pas la
     caractéristique en paramètres. Ce score est élevé pour les caractéristiques divisant les personnages
@@ -97,10 +103,8 @@ def score_dichotomie(personnages_restants, type_caracteristique, valeur_caracter
     avecCaracteristique = 0
     sansCaracteristique = 0
 
-    for personne in personnages_restants.values():
-        if type_caracteristique not in personne:
-            return 0
-        if personne[type_caracteristique] == valeur_caracteristique:
+    for personne in personnages_restants.values(): #personne = dic donnees personnage
+        if possede(personne, type_caracteristique, valeur_caracteristique):
             avecCaracteristique += 1
         else:
             sansCaracteristique += 1
@@ -111,7 +115,8 @@ def score_dichotomie(personnages_restants, type_caracteristique, valeur_caracter
     return score
 
 
-def selectionner_caracteristique(personnages_restants): #TESTED AND FONCTIONNAL
+# TESTED AND FONCTIONNAL
+def selectionner_caracteristique(personnages_restants):
     """
     Parmi tous les couples type/valeur de caractéristiques, retourne
     celui qui présente le meilleur score de dichotomie. Les types et valeurs doivent être
@@ -128,15 +133,16 @@ def selectionner_caracteristique(personnages_restants): #TESTED AND FONCTIONNAL
     """
     dicCompteur = {}
 
-    for t in types_caracteristiques_ordre_aleatoire():
-        for v in valeurs_ordre_aleatoire(t):
-            dicCompteur[(t, v)] = score_dichotomie(personnages_restants, t, v)
-    highScore = max(dicCompteur, key=lambda key: dicCompteur[key])
+    for type in types_caracteristiques_ordre_aleatoire(): 
+        for valeur in valeurs_ordre_aleatoire(type):
+            dicCompteur[(type, valeur)] = score_dichotomie(personnages_restants, type, valeur)
+    highScoreCouple = max(dicCompteur, key=lambda key: dicCompteur[key])
 
-    return highScore
+    return highScoreCouple
 
 
-def mettre_a_jour_hypotheses(personnages_restants, type_caracteristique, valeur_caracteristique, reponse): #TESTED AND FONCTIONNAL
+# TESTED AND FONCTIONNAL
+def mettre_a_jour_hypotheses(personnages_restants, type_caracteristique, valeur_caracteristique, reponse):
     """
     Retourne un dictionnaire basé sur le dictionnaire de personnages restants en paramètre, dans
     lequel on enlève les personnages qui possèdent ou ne possèdent pas la caractéristique en paramètres.
@@ -155,17 +161,17 @@ def mettre_a_jour_hypotheses(personnages_restants, type_caracteristique, valeur_
     Returns:
         dict: Le dictionnaire de personnages restants mis à jour.
     """
-    personneToKill = []
-    restantTemporaire = personnages_restants.copy()
+    people2Remove = []
+    updatedPersonnagesRestants = personnages_restants.copy() #sans le copy je ne passais pas les assert a la fin.
 
-    for personne, data in restantTemporaire.items():
+    for personne, data in updatedPersonnagesRestants.items(): # personne = nom, data = dic donnes personne.
         if possede(data, type_caracteristique, valeur_caracteristique) != reponse:
-            personneToKill.append(personne)
+            people2Remove.append(personne)
 
-    for personne in personneToKill:
-        del restantTemporaire[personne]
+    for personne in people2Remove:
+        del updatedPersonnagesRestants[personne]
 
-    return restantTemporaire
+    return updatedPersonnagesRestants
 
 
 if __name__ == '__main__': #ALL TESTS SUCCESSFUL
@@ -190,8 +196,10 @@ if __name__ == '__main__': #ALL TESTS SUCCESSFUL
                    'Eric': {'genre': 'homme', 'accessoires': ['chapeau']},
                    'George': {'genre': 'homme', 'accessoires': ['chapeau']},
                    'Maria': {'genre': 'femme', 'accessoires': ['chapeau']}}
-    assert score_dichotomie(personnages, 'genre', 'homme') == 2  # = 5 - max(3, 2)
-    assert score_dichotomie(personnages, 'accessoires', 'chapeau') == 0  # = 5 - max(5, 0)
+    assert score_dichotomie(personnages, 'genre',
+                            'homme') == 2  # = 5 - max(3, 2)
+    assert score_dichotomie(personnages, 'accessoires',
+                            'chapeau') == 0  # = 5 - max(5, 0)
 
     # Aucun test n'est fourni pour selectionner_caracteristiques
 
